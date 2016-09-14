@@ -1,16 +1,20 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1alpha1
+kind: PetSet
 metadata:
   name: es-data
   labels:
     component: elasticsearch
     role: data
 spec:
+  serviceName: es-data
+  replicas: 3
   template:
     metadata:
       labels:
         component: elasticsearch
         role: data
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
     spec:
       containers:
       - name: es-data
@@ -19,7 +23,7 @@ spec:
           capabilities:
             add:
               - IPC_LOCK
-        image: quay.io/pires/docker-elasticsearch-kubernetes:2.3.5_1
+        image: quay.syman.megaleo.com/argus/docker-elasticsearch-kubernetes:2.3.5_1
         imagePullPolicy: Always
         env:
         - name: NAMESPACE
@@ -33,15 +37,23 @@ spec:
         - name: HTTP_ENABLE
           value: "false"
         - name: ES_HEAP_SIZE
-          value: "256m"
+          value: "2g"
         ports:
         - containerPort: 9300
           name: transport
           protocol: TCP
+        - containerPort: 65535
+          name: anti-affinity
+          hostPort: 65535
         volumeMounts:
         - name: storage
           mountPath: /data
-      volumes:
-          - emptyDir:
-              medium: ""
-            name: "storage"
+  volumeClaimTemplates:
+  - metadata:
+      name: storage
+    spec:
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 5000Mi
