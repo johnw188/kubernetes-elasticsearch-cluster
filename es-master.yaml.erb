@@ -37,14 +37,16 @@ spec:
           value: "false"
         - name: ES_HEAP_SIZE
           value: "2g"
+        - name: NUMBER_OF_MASTERS
+          value: "2"
         ports:
         - containerPort: 9300
           name: transport
           protocol: TCP
         volumeMounts:
-        - name: storage
+        - name: esstorage
           mountPath: /data
       volumes:
           - emptyDir:
               medium: ""
-            name: "storage"
+            name: "esstorage"
