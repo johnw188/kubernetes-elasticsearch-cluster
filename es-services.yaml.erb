@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 spec:
   rules:
-  - host: elasticsearch.vmwsuv.megaleo.com
+  - host: elasticsearch.<%= cluster.domain %>
     http:
       paths:
       - path: /
